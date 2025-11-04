@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Pushup Challenge Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .setup-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 1.1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .target-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .start-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            margin-top: 20px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .workout-section {
+            display: none;
+        }
+
+        .workout-section.active {
+            display: block;
+        }
+
+        .timer-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        .timer {
+            font-size: 5em;
+            font-weight: 700;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            flex: 1;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar-container {
+            background: #e0e0e0;
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .quote-box {
+            background: #f8f9fa;
+            color: #333;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-style: italic;
+            font-size: 1.1em;
+            line-height: 1.6;
+            border-left: 4px solid #667eea;
+        }
+
+        .next-minute-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.5em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            margin-bottom: 15px;
+        }
+
+        .next-minute-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .next-minute-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .reset-btn {
+            width: 100%;
+            background: #f5576c;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        .reset-btn:hover {
+            background: #e04758;
+            transform: translateY(-2px);
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .celebrate {
+            animation: celebrate 0.6s ease;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💪 Custom Pushup Challenge</h1>
+        <p class="subtitle">Set your goal and crush it!</p>
+
+        <!-- Setup Section -->
+        <div class="setup-section" id="setupSection">
+            <div class="input-group">
+                <label for="targetPushups">Target Pushups</label>
+                <input type="number" id="targetPushups" value="100" min="1" placeholder="e.g., 100">
+            </div>
+            <div class="input-group">
+                <label for="totalMinutes">Total Minutes</label>
+                <input type="number" id="totalMinutes" value="30" min="1" placeholder="e.g., 30">
+            </div>
+            <div class="target-display" id="targetDisplay">
+                Set your target and time above
+            </div>
+            <button class="start-btn" onclick="startChallenge()">Start Challenge 🚀</button>
+        </div>
+
+        <!-- Workout Section -->
+        <div class="workout-section" id="workoutSection">
+            <div class="timer-section">
+                <div class="timer-label">TIME REMAINING</div>
+                <div class="timer" id="timer">1:00</div>
+                <div class="timer-label" id="currentMinute">Minute 1</div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="totalPushups">0</div>
+                    <div class="stat-label">Pushups Done</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="currentMinuteNum">1</div>
+                    <div class="stat-label">Current Minute</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="remaining">0</div>
+                    <div class="stat-label">To Go</div>
+                </div>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+            </div>
+
+            <div class="quote-box" id="quoteBox">
+                Complete this minute and click "Next Minute" to continue!
+            </div>
+
+            <button class="next-minute-btn" id="nextMinuteBtn" onclick="nextMinute()">
+                Next Minute (Add <span id="pushupsPerMin">0</span> pushups)
+            </button>
+
+            <button class="reset-btn" onclick="resetChallenge()">Reset Challenge</button>
+        </div>
+    </div>
+
+    <script>
+        const quotes = [
+            "The only bad workout is the one that didn't happen.",
+            "Your body can stand almost anything. It's your mind you have to convince.",
+            "Push harder than yesterday if you want a different tomorrow.",
+            "Success isn't always about greatness. It's about consistency.",
+            "The pain you feel today will be the strength you feel tomorrow.",
+            "Don't stop when you're tired. Stop when you're done.",
+            "You're stronger than you think. Keep going!",
+            "Every rep brings you closer to your goal.",
+            "Champions aren't made in the gym. They're made from determination.",
+            "The difference between try and triumph is a little umph!",
+            "Believe in yourself and all that you are capable of.",
+            "Your only limit is you. Break through it!",
+            "Sweat is just fat crying. Keep pushing!",
+            "The body achieves what the mind believes.",
+            "You didn't come this far to only come this far.",
+            "Strive for progress, not perfection.",
+            "Make yourself proud today!",
+            "You're doing amazing! Keep that fire burning!",
+            "This is your time. Own it!",
+            "Strength doesn't come from what you can do. It comes from overcoming what you thought you couldn't."
+        ];
+
+        let targetPushups = 0;
+        let totalMinutes = 0;
+        let pushupsPerMinute = 0;
+        let currentMinute = 1;
+        let totalCompleted = 0;
+        let timerInterval = null;
+        let secondsRemaining = 60;
+
+        // Update target display when inputs change
+        document.getElementById('targetPushups').addEventListener('input', updateTargetDisplay);
+        document.getElementById('totalMinutes').addEventListener('input', updateTargetDisplay);
+
+        function updateTargetDisplay() {
+            const target = parseInt(document.getElementById('targetPushups').value) || 0;
+            const minutes = parseInt(document.getElementById('totalMinutes').value) || 0;
+            
+            if (target > 0 && minutes > 0) {
+                const perMin = Math.ceil(target / minutes);
+                document.getElementById('targetDisplay').textContent = 
+                    `You'll need to do ${perMin} pushups per minute to reach ${target} pushups in ${minutes} minutes`;
+            } else {
+                document.getElementById('targetDisplay').textContent = 
+                    'Set your target and time above';
+            }
+        }
+
+        function startChallenge() {
+            targetPushups = parseInt(document.getElementById('targetPushups').value);
+            totalMinutes = parseInt(document.getElementById('totalMinutes').value);
+
+            if (!targetPushups || !totalMinutes || targetPushups < 1 || totalMinutes < 1) {
+                alert('Please enter valid numbers for pushups and minutes!');
+                return;
+            }
+
+            pushupsPerMinute = Math.ceil(targetPushups / totalMinutes);
+            currentMinute = 1;
+            totalCompleted = 0;
+            secondsRemaining = 60;
+
+            document.getElementById('setupSection').style.display = 'none';
+            document.getElementById('workoutSection').classList.add('active');
+            
+            document.getElementById('pushupsPerMin').textContent = pushupsPerMinute;
+            document.getElementById('remaining').textContent = targetPushups;
+            
+            startTimer();
+            updateStats();
+            showRandomQuote();
+        }
+
+        function startTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+
+            secondsRemaining = 60;
+            document.getElementById('nextMinuteBtn').disabled = true;
+            
+            timerInterval = setInterval(() => {
+                secondsRemaining--;
+                
+                const minutes = Math.floor(secondsRemaining / 60);
+                const seconds = secondsRemaining % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                if (secondsRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('nextMinuteBtn').disabled = false;
+                    document.getElementById('timer').classList.add('pulse');
+                    setTimeout(() => {
+                        document.getElementById('timer').classList.remove('pulse');
+                    }, 500);
+                }
+            }, 1000);
+        }
+
+        function nextMinute() {
+            if (currentMinute >= totalMinutes) {
+                finishChallenge();
+                return;
+            }
+
+            totalCompleted += pushupsPerMinute;
+            currentMinute++;
+            
+            updateStats();
+            showRandomQuote();
+            startTimer();
+
+            document.querySelectorAll('.stat-box').forEach(box => {
+                box.classList.add('pulse');
+                setTimeout(() => box.classList.remove('pulse'), 500);
+            });
+        }
+
+        function updateStats() {
+            const percentage = Math.round((totalCompleted / targetPushups) * 100);
+            const remaining = Math.max(0, targetPushups - totalCompleted);
+
+            document.getElementById('totalPushups').textContent = totalCompleted;
+            document.getElementById('currentMinuteNum').textContent = currentMinute;
+            document.getElementById('currentMinute').textContent = `Minute ${currentMinute} of ${totalMinutes}`;
+            document.getElementById('remaining').textContent = remaining;
+            
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = Math.min(percentage, 100) + '%';
+            progressBar.textContent = Math.min(percentage, 100) + '%';
+
+            if (currentMinute >= totalMinutes) {
+                document.getElementById('nextMinuteBtn').textContent = 'Finish Challenge 🎉';
+            }
+        }
+
+        function showRandomQuote() {
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quoteBox').textContent = `"${randomQuote}"`;
+        }
+
+        function finishChallenge() {
+            totalCompleted += pushupsPerMinute;
+            clearInterval(timerInterval);
+            
+            document.getElementById('timer').textContent = '0:00';
+            document.getElementById('quoteBox').innerHTML = 
+                `<div style="font-size: 1.5em; font-weight: bold;">🎉 AMAZING! You completed ${totalCompleted} pushups! 🏆</div>
+                <div style="margin-top: 10px;">You're an absolute champion!</div>`;
+            
+            document.getElementById('nextMinuteBtn').disabled = true;
+            document.getElementById('nextMinuteBtn').textContent = 'Challenge Complete! 🎊';
+            
+            updateStats();
+            
+            document.querySelector('.timer-section').classList.add('celebrate');
+            setTimeout(() => {
+                document.querySelector('.timer-section').classList.remove('celebrate');
+            }, 600);
+        }
+
+        function resetChallenge() {
+            if (confirm('Are you sure you want to reset and start over?')) {
+                clearInterval(timerInterval);
+                document.getElementById('setupSection').style.display = 'block';
+                document.getElementById('workoutSection').classList.remove('active');
+                updateTargetDisplay();
+            }
+        }
+
+        updateTargetDisplay();
+    </script>
+</body>
+</html>
