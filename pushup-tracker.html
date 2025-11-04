@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Pushups Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .progress-section {
+            margin-bottom: 30px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            flex: 1;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar-container {
+            background: #e0e0e0;
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .quote-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-style: italic;
+            font-size: 1.1em;
+            line-height: 1.6;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .minute-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .minute-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .minute-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .minute-btn.completed {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #764ba2;
+        }
+
+        .minute-btn.completed::after {
+            content: '✓';
+            position: absolute;
+            top: 2px;
+            right: 6px;
+            font-size: 1.2em;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .reset-btn {
+            background: #f5576c;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        .reset-btn:hover {
+            background: #e04758;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse {
+            animation: pulse 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💪 100 Pushups Challenge</h1>
+        <p class="subtitle">Complete 100 pushups in 30 minutes</p>
+
+        <div class="progress-section">
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="totalPushups">0</div>
+                    <div class="stat-label">Pushups Done</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="minutesCompleted">0</div>
+                    <div class="stat-label">Minutes Active</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="remaining">100</div>
+                    <div class="stat-label">To Go</div>
+                </div>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+            </div>
+        </div>
+
+        <div class="quote-box" id="quoteBox">
+            Click a minute to start your journey! 🚀
+        </div>
+
+        <div class="minute-grid" id="minuteGrid"></div>
+
+        <div class="control-buttons">
+            <button class="reset-btn" onclick="resetChallenge()">Reset Challenge</button>
+        </div>
+    </div>
+
+    <script>
+        const quotes = [
+            "The only bad workout is the one that didn't happen.",
+            "Your body can stand almost anything. It's your mind you have to convince.",
+            "Push harder than yesterday if you want a different tomorrow.",
+            "Success isn't always about greatness. It's about consistency.",
+            "The pain you feel today will be the strength you feel tomorrow.",
+            "Don't stop when you're tired. Stop when you're done.",
+            "You're stronger than you think. Keep going!",
+            "Every rep brings you closer to your goal.",
+            "Champions aren't made in the gym. They're made from determination.",
+            "The difference between try and triumph is a little umph!",
+            "Believe in yourself and all that you are capable of.",
+            "Your only limit is you. Break through it!",
+            "Sweat is just fat crying. Keep pushing!",
+            "The body achieves what the mind believes.",
+            "You didn't come this far to only come this far.",
+            "Strive for progress, not perfection.",
+            "Make yourself proud today!",
+            "You're doing amazing! Keep that fire burning!",
+            "This is your time. Own it!",
+            "Strength doesn't come from what you can do. It comes from overcoming what you thought you couldn't."
+        ];
+
+        let completedMinutes = {};
+        let totalPushups = 0;
+
+        function initializeGrid() {
+            const grid = document.getElementById('minuteGrid');
+            for (let i = 1; i <= 30; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'minute-btn';
+                btn.textContent = `Min ${i}`;
+                btn.onclick = () => logMinute(i);
+                btn.id = `minute-${i}`;
+                grid.appendChild(btn);
+            }
+        }
+
+        function logMinute(minute) {
+            if (!completedMinutes[minute]) {
+                completedMinutes[minute] = true;
+                const btn = document.getElementById(`minute-${minute}`);
+                btn.classList.add('completed', 'pulse');
+                
+                const pushups = Math.floor(Math.random() * 5) + 3;
+                totalPushups += pushups;
+                
+                updateStats();
+                showRandomQuote();
+                
+                setTimeout(() => btn.classList.remove('pulse'), 300);
+            }
+        }
+
+        function updateStats() {
+            const minutesCount = Object.keys(completedMinutes).length;
+            const percentage = Math.round((totalPushups / 100) * 100);
+            const remaining = Math.max(0, 100 - totalPushups);
+
+            document.getElementById('totalPushups').textContent = totalPushups;
+            document.getElementById('minutesCompleted').textContent = minutesCount;
+            document.getElementById('remaining').textContent = remaining;
+            
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = Math.min(percentage, 100) + '%';
+            progressBar.textContent = Math.min(percentage, 100) + '%';
+
+            if (totalPushups >= 100) {
+                document.getElementById('quoteBox').textContent = "🎉 INCREDIBLE! You crushed the 100 pushup challenge! You're a champion! 🏆";
+            }
+        }
+
+        function showRandomQuote() {
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quoteBox').textContent = `"${randomQuote}"`;
+        }
+
+        function resetChallenge() {
+            if (confirm('Are you sure you want to reset your progress?')) {
+                completedMinutes = {};
+                totalPushups = 0;
+                
+                document.querySelectorAll('.minute-btn').forEach(btn => {
+                    btn.classList.remove('completed');
+                });
+                
+                updateStats();
+                document.getElementById('quoteBox').textContent = "Click a minute to start your journey! 🚀";
+            }
+        }
+
+        initializeGrid();
+    </script>
+</body>
+</html>
