@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Pushup Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header .tagline {
+            color: #666;
+            font-size: 1.1em;
+            font-weight: 400;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            text-align: center;
+        }
+
+        .welcome-screen h2 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .welcome-screen .insight {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 16px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+            text-align: left;
+        }
+
+        .welcome-screen .insight-label {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-screen .insight-value {
+            color: #333;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            margin: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+        }
+
+        /* Setup Screen */
+        .setup-screen .input-group {
+            margin-bottom: 25px;
+        }
+
+        .setup-screen label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .setup-screen input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 1.1em;
+            transition: border-color 0.3s;
+        }
+
+        .setup-screen input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .suggestion-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        /* Workout Screen */
+        .workout-screen .timer-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        .timer {
+            font-size: 5em;
+            font-weight: 700;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar-container {
+            background: #e0e0e0;
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .rep-input-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .rep-input-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .rep-input-section input {
+            width: 120px;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 2em;
+            text-align: center;
+            font-weight: 700;
+            margin: 10px;
+        }
+
+        .quick-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .quick-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .motivation-box {
+            background: #f8f9fa;
+            color: #333;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.1em;
+            line-height: 1.6;
+            border-left: 4px solid #667eea;
+        }
+
+        .motivation-box.beating-yesterday {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #1a5f4a;
+            border-left: 4px solid #1a5f4a;
+            font-weight: 600;
+        }
+
+        .motivation-box.struggling {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        /* History Screen */
+        .history-screen .history-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .history-list {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+        }
+
+        .history-item .date {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .history-item .stats {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .celebrate {
+            animation: celebrate 0.6s ease;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn-small {
+            padding: 12px 24px;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💪 Intelligent Pushup Tracker</h1>
+            <p class="tagline">Your adaptive training companion</p>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="welcome-screen">
+            <h2>Welcome Back, Champion!</h2>
+            <div id="welcomeInsights"></div>
+            <div class="btn-group">
+                <button class="btn-primary" onclick="app.startNewWorkout()">Start Workout 🚀</button>
+                <button class="btn-secondary btn-small" onclick="app.showHistory()">View History 📊</button>
+            </div>
+        </div>
+
+        <!-- Setup Screen -->
+        <div id="setupScreen" class="setup-screen hidden">
+            <h2 style="margin-bottom: 20px; color: #333;">Set Your Goal</h2>
+            <div id="suggestionBox" class="suggestion-box"></div>
+            <div class="input-group">
+                <label for="targetPushups">Target Pushups</label>
+                <input type="number" id="targetPushups" min="1" placeholder="e.g., 100">
+            </div>
+            <div class="input-group">
+                <label for="totalMinutes">Total Minutes</label>
+                <input type="number" id="totalMinutes" min="1" placeholder="e.g., 10">
+            </div>
+            <div class="btn-group">
+                <button class="btn-primary" onclick="app.beginWorkout()">Begin Workout 💪</button>
+                <button class="btn-secondary btn-small" onclick="app.showWelcome()">Back</button>
+            </div>
+        </div>
+
+        <!-- Workout Screen -->
+        <div id="workoutScreen" class="workout-screen hidden">
+            <div class="timer-section">
+                <div class="timer-label">TIME REMAINING</div>
+                <div class="timer" id="timer">1:00</div>
+                <div class="timer-label" id="minuteLabel">Minute 1</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number" id="totalCompleted">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="currentMinuteDisplay">1</div>
+                    <div class="stat-label">Current Minute</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="remainingDisplay">0</div>
+                    <div class="stat-label">Remaining</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="paceDisplay">-</div>
+                    <div class="stat-label">Avg/Min</div>
+                </div>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+            </div>
+
+            <div class="motivation-box" id="motivationBox"></div>
+
+            <div class="rep-input-section" id="repInputSection">
+                <h3>How many pushups did you complete?</h3>
+                <input type="number" id="repsInput" min="0" placeholder="0">
+                <div class="quick-buttons" id="quickButtons"></div>
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="app.completeMinute()">Next Minute ➡️</button>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-secondary btn-small" onclick="app.pauseWorkout()">Pause</button>
+                <button class="btn-secondary btn-small" onclick="app.endWorkout()">End Workout</button>
+            </div>
+        </div>
+
+        <!-- History Screen -->
+        <div id="historyScreen" class="history-screen hidden">
+            <h2 style="margin-bottom: 20px; color: #333;">Your Progress</h2>
+            <div class="history-stats" id="historyStats"></div>
+            <div class="history-list" id="historyList"></div>
+            <div class="btn-group">
+                <button class="btn-primary" onclick="app.showWelcome()">Back to Home</button>
+                <button class="btn-secondary btn-small" onclick="app.clearHistory()">Clear History</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = {
+            state: {
+                workouts: [],
+                currentWorkout: null,
+                timerInterval: null,
+                secondsRemaining: 60,
+                currentMinute: 1,
+                totalCompleted: 0
+            },
+
+            motivationalQuotes: {
+                crushing: [
+                    "You're on fire! This is YOUR moment! 🔥",
+                    "Absolutely crushing it! Keep this momentum!",
+                    "This is what champions look like! Unstoppable!",
+                    "You're exceeding expectations! Beautiful work!"
+                ],
+                onPace: [
+                    "Perfect pace! Stay consistent, you've got this!",
+                    "Right on track! Your discipline is showing!",
+                    "Steady and strong! This is how progress happens!",
+                    "Maintaining excellence! Keep the rhythm!"
+                ],
+                struggling: [
+                    "Every rep counts. You're still moving forward!",
+                    "It's tough, but YOU are tougher. Keep going!",
+                    "This is where character is built. Don't quit!",
+                    "Struggling means you're growing. Embrace it!"
+                ],
+                final: [
+                    "Final push! Leave everything on the floor!",
+                    "This is it! Finish strong, finish proud!",
+                    "One more minute! You've come too far to stop now!",
+                    "Dig deep! This last effort defines you!"
+                ]
+            },
+
+            async init() {
+                await this.loadWorkouts();
+                this.showWelcome();
+            },
+
+            async loadWorkouts() {
+                try {
+                    const result = await window.storage.list('workout:');
+                    if (result && result.keys) {
+                        this.state.workouts = [];
+                        for (const key of result.keys) {
+                            try {
+                                const data = await window.storage.get(key);
+                                if (data && data.value) {
+                                    this.state.workouts.push(JSON.parse(data.value));
+                                }
+                            } catch (e) {
+                                console.log('Workout not found:', key);
+                            }
+                        }
+                        this.state.workouts.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    }
+                } catch (error) {
+                    console.log('No previous workouts found');
+                    this.state.workouts = [];
+                }
+            },
+
+            async saveWorkout(workout) {
+                const key = `workout:${workout.id}`;
+                try {
+                    await window.storage.set(key, JSON.stringify(workout));
+                    await this.loadWorkouts();
+                } catch (error) {
+                    console.error('Error saving workout:', error);
+                }
+            },
+
+            showWelcome() {
+                this.hideAllScreens();
+                document.getElementById('welcomeScreen').classList.remove('hidden');
+                this.renderWelcomeInsights();
+            },
+
+            renderWelcomeInsights() {
+                const container = document.getElementById('welcomeInsights');
+                
+                if (this.state.workouts.length === 0) {
+                    container.innerHTML = `
+                        <div class="insight">
+                            <div class="insight-label">First Time?</div>
+                            <div class="insight-value">Let's discover what you're capable of! Start with a baseline workout and I'll adapt to your performance.</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const lastWorkout = this.state.workouts[0];
+                const totalWorkouts = this.state.workouts.length;
+                const totalPushups = this.state.workouts.reduce((sum, w) => sum + w.totalCompleted, 0);
+                const avgPerWorkout = Math.round(totalPushups / totalWorkouts);
+                const bestWorkout = this.state.workouts.reduce((best, w) => 
+                    w.totalCompleted > best.totalCompleted ? w : best
+                );
+
+                container.innerHTML = `
+                    <div class="insight">
+                        <div class="insight-label">Last Workout</div>
+                        <div class="insight-value">${lastWorkout.totalCompleted} pushups in ${lastWorkout.totalMinutes} minutes</div>
+                        <div style="color: #666; margin-top: 5px;">${this.formatDate(lastWorkout.date)}</div>
+                    </div>
+                    <div class="insight">
+                        <div class="insight-label">Your Stats</div>
+                        <div class="insight-value">${totalWorkouts} workouts • ${totalPushups} total pushups • ${avgPerWorkout} avg</div>
+                    </div>
+                    <div class="insight">
+                        <div class="insight-label">Personal Best</div>
+                        <div class="insight-value">${bestWorkout.totalCompleted} pushups on ${this.formatDate(bestWorkout.date)}</div>
+                    </div>
+                `;
+            },
+
+            startNewWorkout() {
+                this.hideAllScreens();
+                document.getElementById('setupScreen').classList.remove('hidden');
+                this.renderSuggestion();
+            },
+
+            renderSuggestion() {
+                const box = document.getElementById('suggestionBox');
+                
+                if (this.state.workouts.length === 0) {
+                    box.innerHTML = `
+                        <strong>📊 Baseline Assessment</strong><br>
+                        I suggest starting with 50 pushups in 10 minutes (5 per minute). This will help me understand your current level and adapt future workouts.
+                    `;
+                    document.getElementById('targetPushups').value = 50;
+                    document.getElementById('totalMinutes').value = 10;
+                } else {
+                    const lastWorkout = this.state.workouts[0];
+                    const recentWorkouts = this.state.workouts.slice(0, 5);
+                    const avgCompletion = recentWorkouts.reduce((sum, w) => 
+                        sum + (w.totalCompleted / w.targetPushups), 0
+                    ) / recentWorkouts.length;
+
+                    let suggestion = lastWorkout.targetPushups;
+                    let message = '';
+
+                    if (avgCompletion >= 0.95) {
+                        suggestion = Math.round(lastWorkout.targetPushups * 1.1);
+                        message = `<strong>🚀 Level Up!</strong><br>You've been crushing it! Let's push to ${suggestion} pushups.`;
+                    } else if (avgCompletion >= 0.8) {
+                        suggestion = lastWorkout.targetPushups;
+                        message = `<strong>💪 Stay Consistent</strong><br>You're making solid progress. Let's aim for ${suggestion} again and build that consistency.`;
+                    } else {
+                        suggestion = Math.round(lastWorkout.targetPushups * 0.9);
+                        message = `<strong>🎯 Smart Adjustment</strong><br>Let's dial it back to ${suggestion} and focus on quality. Build momentum first.`;
+                    }
+
+                    box.innerHTML = message;
+                    document.getElementById('targetPushups').value = suggestion;
+                    document.getElementById('totalMinutes').value = lastWorkout.totalMinutes;
+                }
+            },
+
+            beginWorkout() {
+                const target = parseInt(document.getElementById('targetPushups').value);
+                const minutes = parseInt(document.getElementById('totalMinutes').value);
+
+                if (!target || !minutes || target < 1 || minutes < 1) {
+                    alert('Please enter valid numbers!');
+                    return;
+                }
+
+                this.state.currentWorkout = {
+                    id: Date.now(),
+                    date: new Date().toISOString(),
+                    targetPushups: target,
+                    totalMinutes: minutes,
+                    minuteData: [],
+                    totalCompleted: 0
+                };
+
+                this.state.currentMinute = 1;
+                this.state.totalCompleted = 0;
+
+                this.hideAllScreens();
+                document.getElementById('workoutScreen').classList.remove('hidden');
+                this.startTimer();
+                this.updateWorkoutUI();
+                this.generateQuickButtons();
+            },
+
+            startTimer() {
+                if (this.state.timerInterval) {
+                    clearInterval(this.state.timerInterval);
+                }
+
+                this.state.secondsRemaining = 60;
+                document.getElementById('repInputSection').style.opacity = '0.5';
+                document.getElementById('repInputSection').style.pointerEvents = 'none';
+
+                this.state.timerInterval = setInterval(() => {
+                    this.state.secondsRemaining--;
+                    
+                    const minutes = Math.floor(this.state.secondsRemaining / 60);
+                    const seconds = this.state.secondsRemaining % 60;
+                    document.getElementById('timer').textContent = 
+                        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                    if (this.state.secondsRemaining <= 0) {
+                        clearInterval(this.state.timerInterval);
+                        document.getElementById('repInputSection').style.opacity = '1';
+                        document.getElementById('repInputSection').style.pointerEvents = 'auto';
+                        document.getElementById('repsInput').focus();
+                        document.getElementById('timer').classList.add('pulse');
+                        setTimeout(() => {
+                            document.getElementById('timer').classList.remove('pulse');
+                        }, 500);
+                    }
+                }, 1000);
+            },
+
+            generateQuickButtons() {
+                const container = document.getElementById('quickButtons');
+                const perMinute = Math.ceil(this.state.currentWorkout.targetPushups / this.state.currentWorkout.totalMinutes);
+                const values = [
+                    Math.floor(perMinute * 0.5),
+                    Math.floor(perMinute * 0.75),
+                    perMinute,
+                    Math.floor(perMinute * 1.25),
+                    Math.floor(perMinute * 1.5)
+                ].filter((v, i, arr) => arr.indexOf(v) === i && v > 0);
+
+                container.innerHTML = values.map(v => 
+                    `<button class="quick-btn" onclick="app.setReps(${v})">${v}</button>`
+                ).join('');
+            },
+
+            setReps(value) {
+                document.getElementById('repsInput').value = value;
+            },
+
+            completeMinute() {
+                const reps = parseInt(document.getElementById('repsInput').value) || 0;
+                
+                this.state.currentWorkout.minuteData.push({
+                    minute: this.state.currentMinute,
+                    reps: reps
+                });
+
+                this.state.totalCompleted += reps;
+                this.state.currentWorkout.totalCompleted = this.state.totalCompleted;
+
+                if (this.state.currentMinute >= this.state.currentWorkout.totalMinutes) {
+                    this.finishWorkout();
+                    return;
+                }
+
+                this.state.currentMinute++;
+                document.getElementById('repsInput').value = '';
+                this.updateWorkoutUI();
+                this.startTimer();
+
+                document.querySelectorAll('.stat-box').forEach(box => {
+                    box.classList.add('pulse');
+                    setTimeout(() => box.classList.remove('pulse'), 500);
+                });
+            },
+
+            updateWorkoutUI() {
+                const workout = this.state.currentWorkout;
+                const progress = (this.state.totalCompleted / workout.targetPushups) * 100;
+                const remaining = Math.max(0, workout.targetPushups - this.state.totalCompleted);
+                const avgPace = this.state.currentMinute > 1 
+                    ? (this.state.totalCompleted / (this.state.currentMinute - 1)).toFixed(1)
+                    : '-';
+
+                document.getElementById('totalCompleted').textContent = this.state.totalCompleted;
+                document.getElementById('currentMinuteDisplay').textContent = this.state.currentMinute;
+                document.getElementById('minuteLabel').textContent = 
+                    `Minute ${this.state.currentMinute} of ${workout.totalMinutes}`;
+                document.getElementById('remainingDisplay').textContent = remaining;
+                document.getElementById('paceDisplay').textContent = avgPace;
+
+                const progressBar = document.getElementById('progressBar');
+                const progressCapped = Math.min(progress, 100);
+                progressBar.style.width = progressCapped + '%';
+                progressBar.textContent = Math.round(progressCapped) + '%';
+
+                this.updateMotivation();
+            },
+
+            updateMotivation() {
+                const workout = this.state.currentWorkout;
+                const expectedPace = workout.targetPushups / workout.totalMinutes;
+                const actualPace = this.state.totalCompleted / Math.max(1, this.state.currentMinute - 1);
+                const box = document.getElementById('motivationBox');
+
+                let quotes, className = '';
+
+                if (this.state.currentMinute === workout.totalMinutes) {
+                    quotes = this.motivationalQuotes.final;
+                } else if (actualPace >= expectedPace * 1.1) {
+                    quotes = this.motivationalQuotes.crushing;
+                    className = 'beating-yesterday';
+                } else if (actualPace >= expectedPace * 0.9) {
+                    quotes = this.motivationalQuotes.onPace;
+                } else {
+                    quotes = this.motivationalQuotes.struggling;
+                    className = 'struggling';
+                }
+
+                const quote = quotes[Math.floor(Math.random() * quotes.length)];
+                box.textContent = quote;
+                box.className = 'motivation-box ' + className;
+            },
+
+            async finishWorkout() {
+                clearInterval(this.state.timerInterval);
+                
+                const workout = this.state.currentWorkout;
+                await this.saveWorkout(workout);
+
+                const box = document.getElementById('motivationBox');
+                const achievement = workout.totalCompleted >= workout.targetPushups 
+                    ? '🎉 GOAL CRUSHED! 🎉' 
+                    : '💪 WORKOUT COMPLETE! 💪';
+
+                box.innerHTML = `
+                    <div style="font-size: 1.5em; font-weight: bold;">${achievement}</div>
+                    <div style="margin-top: 10px; font-size: 1.2em;">
+                        ${workout.totalCompleted} pushups in ${workout.totalMinutes} minutes!
+                    </div>
+                    <div style="margin-top: 10px;">
+                        ${this.getWorkoutInsight(workout)}
+                    </div>
+                `;
+
+                box.className = 'motivation-box beating-yesterday';
+                document.querySelector('.timer-section').classList.add('celebrate');
+                document.getElementById('repInputSection').style.display = 'none';
+
+                setTimeout(() => {
+                    document.querySelector('.timer-section').classList.remove('celebrate');
+                }, 600);
+            },
+
+            getWorkoutInsight(workout) {
+                const completionRate = (workout.totalCompleted / workout.targetPushups) * 100;
+                
+                if (completionRate >= 100) {
+                    return "You're getting stronger! 💪";
+                } else if (completionRate >= 90) {
+                    return "So close! You're almost there!";
+                } else if (completionRate >= 75) {
+                    return "Solid effort! Every workout builds you up!";
+                } else {
+                    return "You showed up. That's what matters! 🌟";
+                }
+            },
+
+            pauseWorkout() {
+                if (confirm('Pause workout? Timer will stop.')) {
+                    clearInterval(this.state.timerInterval);
+                }
+            },
+
+            async endWorkout() {
+                if (confirm('End workout early? Your progress will be saved.')) {
+                    clearInterval(this.state.timerInterval);
+                    this.state.currentWorkout.totalCompleted = this.state.totalCompleted;
+                    this.state.currentWorkout.completedEarly = true;
+                    await this.saveWorkout(this.state.currentWorkout);
+                    this.showWelcome();
+                }
+            },
+
+            showHistory() {
+                this.hideAllScreens();
+                document.getElementById('historyScreen').classList.remove('hidden');
+                this.renderHistory();
+            },
+
+            renderHistory() {
+                const statsContainer = document.getElementById('historyStats');
+                const listContainer = document.getElementById('historyList');
+
+                if (this.state.workouts.length === 0) {
+                    listContainer.innerHTML = '<p style="text-align: center; color: #666;">No workouts yet. Start your first one!</p>';
+                    statsContainer.innerHTML = '';
+                    return;
+                }
+
+                const totalWorkouts = this.state.workouts.length;
+                const totalPushups = this.state.workouts.reduce((sum, w) => sum + w.totalCompleted, 0);
+                const avgPerWorkout = Math.round(totalPushups / totalWorkouts);
+                const bestWorkout = this.state.workouts.reduce((best, w) => 
+                    w.totalCompleted > best.totalCompleted ? w : best
+                );
+                const recentAvg = this.state.workouts.slice(0, 5).reduce((sum, w) => 
+                    sum + w.totalCompleted, 0
+                ) / Math.min(5, totalWorkouts);
+
+                statsContainer.innerHTML = `
+                    <div class="stat-box">
+                        <div class="stat-number">${totalWorkouts}</div>
+                        <div class="stat-label">Total Workouts</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">${totalPushups}</div>
+                        <div class="stat-label">Total Pushups</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">${avgPerWorkout}</div>
+                        <div class="stat-label">Average</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">${bestWorkout.totalCompleted}</div>
+                        <div class="stat-label">Personal Best</div>
+                    </div>
+                `;
+
+                listContainer.innerHTML = this.state.workouts.map(workout => {
+                    const completionRate = ((workout.totalCompleted / workout.targetPushups) * 100).toFixed(0);
+                    const avgPerMin = (workout.totalCompleted / workout.totalMinutes).toFixed(1);
+                    
+                    return `
+                        <div class="history-item">
+                            <div class="date">${this.formatDate(workout.date)}</div>
+                            <div class="stats">
+                                <span><strong>${workout.totalCompleted}</strong> pushups</span>
+                                <span>${workout.totalMinutes} minutes</span>
+                                <span>${avgPerMin}/min</span>
+                                <span>${completionRate}% of goal</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            async clearHistory() {
+                if (confirm('Clear all workout history? This cannot be undone.')) {
+                    try {
+                        const result = await window.storage.list('workout:');
+                        if (result && result.keys) {
+                            for (const key of result.keys) {
+                                try {
+                                    await window.storage.delete(key);
+                                } catch (e) {
+                                    console.log('Could not delete:', key);
+                                }
+                            }
+                        }
+                        this.state.workouts = [];
+                        this.showWelcome();
+                    } catch (error) {
+                        console.error('Error clearing history:', error);
+                    }
+                }
+            },
+
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffTime = Math.abs(now - date);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 0) {
+                    return 'Today at ' + date.toLocaleTimeString('en-US', { 
+                        hour: 'numeric', 
+                        minute: '2-digit' 
+                    });
+                } else if (diffDays === 1) {
+                    return 'Yesterday at ' + date.toLocaleTimeString('en-US', { 
+                        hour: 'numeric', 
+                        minute: '2-digit' 
+                    });
+                } else if (diffDays < 7) {
+                    return diffDays + ' days ago';
+                } else {
+                    return date.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+                    });
+                }
+            },
+
+            hideAllScreens() {
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                document.getElementById('setupScreen').classList.add('hidden');
+                document.getElementById('workoutScreen').classList.add('hidden');
+                document.getElementById('historyScreen').classList.add('hidden');
+            }
+        };
+
+        // Initialize the app
+        window.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
